@@ -1,4 +1,7 @@
 # MightyCore
+[![Build Status](https://travis-ci.org/MCUdude/MightyCore.svg?branch=master)](https://travis-ci.org/MCUdude/MightyCore)  
+
+
 An Arduino core for large, breadboard friendly AVRs, all running [Optiboot 6](https://github.com/Optiboot/optiboot). Major libraries such as SD, Servo, SPI and Wire are modified to work with this core. Still, a large amount of third-party libraries often works without any modifications. 
 <br/> <br/>
 This core requires at least Arduino IDE v1.6, where v1.6.11+ is recommended.
@@ -40,11 +43,11 @@ Read more in the hardware section below.
 * ATmega16
 * ATmega8535
 
-<b>*</b> All variants - P, PA, A except PB. Select the correct version in the 'Variant' menu
+All variants - A, P, PA, V except PB. Select the correct version in the 'Variant' menu
 <br/> <br/>
 Can't decide what microcontroller to choose? Have a look at the specification table below:
 
-|                  | mega1284 | mega644 | mega324 | mega164 | mega32 | mega16 | mega8535 |
+|                  | Mega1284 | Mega644 | Mega324 | Mega164 | Mega32 | Mega16 | Mega8535 |
 |------------------|----------|---------|---------|---------|--------|--------|----------|
 | **Flash**        | 128kB    | 64kB    | 32kB    | 16kB    | 32kB   | 16kB   | 8kB      |
 | **RAM**          | 16kB     | 4kB     | 2kB     | 1kB     | 2kB    | 1kB    | 512B     |
