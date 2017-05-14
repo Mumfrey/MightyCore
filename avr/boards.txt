@@ -33,7 +33,7 @@ menu.LTO=Compiler LTO
 1284.bootloader.unlock_bits=0x3f
 1284.bootloader.lock_bits=0x0f
 
-1284.build.core=MightyCore
+1284.build.core=MCUdude_corefiles
 1284.build.board=AVR_ATmega1284
 
 # Pinouts
@@ -137,7 +137,7 @@ menu.LTO=Compiler LTO
 644.bootloader.unlock_bits=0x3f
 644.bootloader.lock_bits=0x0f
 
-644.build.core=MightyCore
+644.build.core=MCUdude_corefiles
 644.build.board=AVR_ATmega644
 
 # Pinouts
@@ -241,7 +241,7 @@ menu.LTO=Compiler LTO
 324.bootloader.unlock_bits=0x3f
 324.bootloader.lock_bits=0x0f
 
-324.build.core=MightyCore
+324.build.core=MCUdude_corefiles
 324.build.board=AVR_ATmega324
 
 # Pinouts
@@ -347,7 +347,7 @@ menu.LTO=Compiler LTO
 164.bootloader.unlock_bits=0x3f
 164.bootloader.lock_bits=0x0f
 
-164.build.core=MightyCore
+164.build.core=MCUdude_corefiles
 164.build.board=AVR_ATmega164
 
 # Pinouts
@@ -453,7 +453,7 @@ menu.LTO=Compiler LTO
 32.bootloader.low_fuses=0b{bootloader.bod_bits}{bootloader.sut_cksel_bits}
 
 32.build.mcu=atmega32
-32.build.core=MightyCore
+32.build.core=MCUdude_corefiles
 32.build.board=AVR_ATmega32
 
 # Pinouts
@@ -552,7 +552,7 @@ menu.LTO=Compiler LTO
 
 
 16.build.mcu=atmega16
-16.build.core=MightyCore
+16.build.core=MCUdude_corefiles
 16.build.board=AVR_ATmega16
 
 # Pinouts
@@ -651,7 +651,7 @@ menu.LTO=Compiler LTO
 8535.bootloader.low_fuses=0b{bootloader.bod_bits}{bootloader.sut_cksel_bits}
 
 8535.build.mcu=atmega8535
-8535.build.core=MightyCore
+8535.build.core=MCUdude_corefiles
 8535.build.board=AVR_ATmega8535
 
 # Pinouts
