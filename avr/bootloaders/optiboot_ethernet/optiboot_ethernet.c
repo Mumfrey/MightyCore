@@ -19,7 +19,7 @@
 /*   Customisable timeout with accurate timeconstant      */
 /*   Optional virtual UART. No hardware UART required.    */
 /*   Optional virtual boot partition for devices without. */
-/*	 Supports "write to flash" in application! 						*/
+/*   Supports "write to flash" in application!            */
 /*                                                        */
 /* What you lose:                                         */
 /*   Implements a skeleton STK500 protocol which is       */
@@ -29,13 +29,13 @@
 /*     Arduino flash settings                             */
 /*                                                        */
 /*  Supported microcontrollers:                           */
-/*   ATmega1284             															*/
-/*   ATmega644           																	*/
-/*   ATmega324           																	*/
-/*   ATmega164           																	*/
-/*   ATmega32           																	*/
-/*   ATmega16           																	*/
-/*   ATmega8535																	          */
+/*   ATmega1284                                           */
+/*   ATmega644                                            */
+/*   ATmega324                                            */
+/*   ATmega164                                            */
+/*   ATmega32                                             */
+/*   ATmega16                                             */
+/*   ATmega8535                                           */
 /*                                                        */
 /*                                                        */
 /* Assumptions:                                           */
@@ -88,7 +88,7 @@
 /*                                                        */
 /**********************************************************/
 /*                                                        */
-/* BIGBOOT:                                              */
+/* BIGBOOT:                                               */
 /* Build a 1k bootloader, not 512 bytes. This turns on    */
 /* extra functionality.                                   */
 /*                                                        */
@@ -140,34 +140,34 @@
 /**********************************************************/
 
 /**********************************************************/
-/* Edit History:					  */
-/*							  */
-/* Aug 2014						  */
+/* Edit History:                                          */
+/*                                                        */
+/* Aug 2014                                               */
 /* 6.2 WestfW: make size of length variables dependent    */
 /*              on the SPM_PAGESIZE.  This saves space    */
 /*              on the chips where it's most important.   */
-/* 6.1 WestfW: Fix OPTIBOOT_CUSTOMVER (send it!)	  */
-/*             Make no-wait mod less picky about	  */
-/*               skipping the bootloader.		  */
-/*             Remove some dead code			  */
-/* Jun 2014						  */
-/* 6.0 WestfW: Modularize memory read/write functions	  */
-/*             Remove serial/flash overlap		  */
-/*              (and all references to NRWWSTART/etc)	  */
+/* 6.1 WestfW: Fix OPTIBOOT_CUSTOMVER (send it!)          */
+/*             Make no-wait mod less picky about          */
+/*               skipping the bootloader.                 */
+/*             Remove some dead code                      */
+/* Jun 2014                                               */
+/* 6.0 WestfW: Modularize memory read/write functions     */
+/*             Remove serial/flash overlap                */
+/*              (and all references to NRWWSTART/etc)     */
 /*             Correctly handle pagesize > 255bytes       */
 /*             Add EEPROM support in BIGBOOT (1284)       */
 /*             EEPROM write on small chips now causes err */
 /*             Split Makefile into smaller pieces         */
-/*             Add Wicked devices Wildfire		  */
-/*	       Move UART=n conditionals into pin_defs.h   */
-/*	       Remove LUDICOUS_SPEED option		  */
-/*	       Replace inline assembler for .version      */
+/*             Add Wicked devices Wildfire                */
+/*         Move UART=n conditionals into pin_defs.h       */
+/*         Remove LUDICOUS_SPEED option                   */
+/*         Replace inline assembler for .version          */
 /*              and add OPTIBOOT_CUSTOMVER for user code  */
 /*             Fix LED value for Bobuino (Makefile)       */
 /*             Make all functions explicitly inline or    */
 /*              noinline, so we fit when using gcc4.8     */
-/*             Change optimization options for gcc4.8	  */
-/*             Make ENV=arduino work in 1.5.x trees.	  */
+/*             Change optimization options for gcc4.8     */
+/*             Make ENV=arduino work in 1.5.x trees.      */
 /* May 2014                                               */
 /* 5.0 WestfW: Add support for 1Mbps UART                 */
 /* Mar 2013                                               */
@@ -178,7 +178,7 @@
 /* 4.6 WestfW/Pito: Add ATmega32 support                  */
 /* 4.6 WestfW/radoni: Don't set LED_PIN as an output if   */
 /*                    not used. (LED_START_FLASHES = 0)   */
-/* Jan 2013						  */
+/* Jan 2013                                               */
 /* 4.6 WestfW/dkinzer: use autoincrement lpm for read     */
 /* 4.6 WestfW/dkinzer: pass reset cause to app in R2      */
 /* Mar 2012                                               */
@@ -209,7 +209,7 @@
 /*  http://code.google.com/p/arduino/issues/detail?id=368n*/
 /* 4.2 WestfW: reduce code size, fix timeouts, change     */
 /*             verifySpace to use WDT instead of appstart */
-/* 4.1 WestfW: put version number in binary.		  */
+/* 4.1 WestfW: put version number in binary.              */
 /**********************************************************/
 
 #define OPTIBOOT_MAJVER 6
@@ -348,9 +348,9 @@ static inline void getNch(uint8_t);
 static inline void flash_led(uint8_t);
 static inline void watchdogReset();
 static inline void writebuffer(int8_t memtype, uint8_t *mybuff,
-			       uint16_t address, pagelen_t len);
+                   uint16_t address, pagelen_t len);
 static inline void read_mem(uint8_t memtype,
-			    uint16_t address, pagelen_t len);
+                   uint16_t address, pagelen_t len);
 static void __attribute__((noinline)) do_spm(uint16_t address, uint8_t command, uint16_t data);
 
 #ifdef SOFT_UART
@@ -378,33 +378,33 @@ void appStart(uint8_t rstFlags) __attribute__ ((naked));
 
 // Make sure all variants gets the correct device signature
 #if defined(__AVR_ATmega1284__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x06
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x06
 #elif defined(__AVR_ATmega1284P__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x05
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x05
 #elif defined(__AVR_ATmega644__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x09
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x09
 #elif defined(__AVR_ATmega644P__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x0A
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x0A
 #elif defined(__AVR_ATmega324A__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x15
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x15
 #elif defined(__AVR_ATmega324P__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x08
-	#elif defined(__AVR_ATmega324PA__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x11	
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x08
+  #elif defined(__AVR_ATmega324PA__)
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x11
 #elif defined(__AVR_ATmega164A__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x0F
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x0F
 #elif defined(__AVR_ATmega164P__)
-	#undef SIGNATURE_2
-	#define SIGNATURE_2 0x0A	
-#endif	
+  #undef SIGNATURE_2
+  #define SIGNATURE_2 0x0A
+#endif
 
 
 /* C zero initialises all global variables. However, that requires */
@@ -461,14 +461,14 @@ void appStart(uint8_t rstFlags) __attribute__ ((naked));
 
 /* everything that needs to run VERY early */
 void pre_main(void) {
-	// Allow convenient way of calling do_spm function - jump table,
-	//   so entry to this function will always be here, indepedent of compilation,
-	//   features etc
-	asm volatile (
-	"	rjmp	1f\n"
-	"	rjmp	do_spm\n"
-	"1:\n"
-	);
+  // Allow convenient way of calling do_spm function - jump table,
+  //   so entry to this function will always be here, indepedent of compilation,
+  //   features etc
+  asm volatile (
+    "   rjmp    1f\n"
+    "   rjmp    do_spm\n"
+    "1:\n"
+  );
 }
 
 
@@ -568,15 +568,15 @@ int main(void) {
        * Note that the references to memory are optimized away.
        */
       if (which == 0x82) {
-	  putch(optiboot_version & 0xFF);
+        putch(optiboot_version & 0xFF);
       } else if (which == 0x81) {
-	  putch(optiboot_version >> 8);
+        putch(optiboot_version >> 8);
       } else {
-	/*
-	 * GET PARAMETER returns a generic 0x03 reply for
+        /*
+         * GET PARAMETER returns a generic 0x03 reply for
          * other parameters - enough to keep Avrdude happy
-	 */
-	putch(0x03);
+         */
+        putch(0x03);
       }
     }
     else if(ch == STK_SET_DEVICE) {
@@ -630,14 +630,14 @@ int main(void) {
  * AVR with 4-byte ISR Vectors and "jmp"
  */
       if (address == 0) {
-	// This is the reset vector page. We need to live-patch the
-	// code so the bootloader runs first.
-	//
-	// Save jmp targets (for "Verify")
-	rstVect0_sav = buff[rstVect0];
-	rstVect1_sav = buff[rstVect1];
-	wdtVect0_sav = buff[wdtVect0];
-	wdtVect1_sav = buff[wdtVect1];
+        // This is the reset vector page. We need to live-patch the
+        // code so the bootloader runs first.
+        //
+        // Save jmp targets (for "Verify")
+        rstVect0_sav = buff[rstVect0];
+        rstVect1_sav = buff[rstVect1];
+        wdtVect0_sav = buff[wdtVect0];
+        wdtVect1_sav = buff[wdtVect1];
 
         // Move RESET jmp target to WDT vector
         buff[wdtVect0] = rstVect0_sav;
@@ -657,21 +657,21 @@ int main(void) {
         // the code so the bootloader runs first.
         //
         // Move RESET vector to WDT vector
-	// Save jmp targets (for "Verify")
-	rstVect0_sav = buff[rstVect0];
-	rstVect1_sav = buff[rstVect1];
-	wdtVect0_sav = buff[wdtVect0];
-	wdtVect1_sav = buff[wdtVect1];
+        // Save jmp targets (for "Verify")
+        rstVect0_sav = buff[rstVect0];
+        rstVect1_sav = buff[rstVect1];
+        wdtVect0_sav = buff[wdtVect0];
+        wdtVect1_sav = buff[wdtVect1];
 
-	// Instruction is a relative jump (rjmp), so recalculate.
-	uint16_t vect=rstVect0_sav+(rstVect1_sav<<8);
+        // Instruction is a relative jump (rjmp), so recalculate.
+        uint16_t vect=rstVect0_sav+(rstVect1_sav<<8);
         vect -= WDT_vect_num;
         // Move RESET jmp target to WDT vector
         buff[wdtVect0] = vect & 0xff;
         buff[wdtVect1] = vect >> 8;
         // Add rjump to bootloader at RESET vector
         buff[0] = (((uint16_t)main) & 0xFFF) & 0xFF; // rjmp 0x1d00 instruction
-	buff[1] =  ((((uint16_t)main) & 0xFFF) >> 8) | 0xC0;
+        buff[1] = ((((uint16_t)main) & 0xFFF) >> 8) | 0xC0;
       }
 #endif // FLASHEND
 #endif // VBP
@@ -759,7 +759,7 @@ uint8_t getch(void) {
   __asm__ __volatile__ (
     "1: sbic  %[uartPin],%[uartBit]\n"  // Wait for start edge
     "   rjmp  1b\n"
-    "   rcall uartDelay\n"          // Get to middle of start bit
+    "   rcall uartDelay\n"              // Get to middle of start bit
     "2: rcall uartDelay\n"              // Wait 1 bit period
     "   rcall uartDelay\n"              // Wait 1 bit period
     "   clc\n"
@@ -835,8 +835,8 @@ void getNch(uint8_t count) {
 void verifySpace() {
   if (getch() != CRC_EOP) {
     watchdogConfig(WATCHDOG_16MS);    // shorten WD timeout
-    while (1)			      // and busy-loop so that WD causes
-      ;				      //  a reset and app start.
+    while (1)                         // and busy-loop so that WD causes
+      ;                               //  a reset and app start.
   }
   putch(STK_INSYNC);
 }
@@ -890,60 +890,60 @@ void appStart(uint8_t rstFlags) {
  * void writebuffer(memtype, buffer, address, length)
  */
 static inline void writebuffer(int8_t memtype, uint8_t *mybuff,
-			       uint16_t address, pagelen_t len)
+                   uint16_t address, pagelen_t len)
 {
     switch (memtype) {
     case 'E': // EEPROM
 #if defined(SUPPORT_EEPROM) || defined(BIGBOOT)
         while(len--) {
-	    eeprom_write_byte((uint8_t *)(address++), *mybuff++);
+        eeprom_write_byte((uint8_t *)(address++), *mybuff++);
         }
 #else
-	/*
-	 * On systems where EEPROM write is not supported, just busy-loop
-	 * until the WDT expires, which will eventually cause an error on
-	 * host system (which is what it should do.)
-	 */
-	while (1)
-	    ; // Error: wait for WDT
+    /*
+     * On systems where EEPROM write is not supported, just busy-loop
+     * until the WDT expires, which will eventually cause an error on
+     * host system (which is what it should do.)
+     */
+    while (1)
+        ; // Error: wait for WDT
 #endif
-	break;
+    break;
     default:  // FLASH
-	/*
-	 * Default to writing to Flash program memory.  By making this
-	 * the default rather than checking for the correct code, we save
-	 * space on chips that don't support any other memory types.
-	 */
-	{
-	    // Copy buffer into programming buffer
-	    uint8_t *bufPtr = mybuff;
-	    uint16_t addrPtr = (uint16_t)(void*)address;
+    /*
+     * Default to writing to Flash program memory.  By making this
+     * the default rather than checking for the correct code, we save
+     * space on chips that don't support any other memory types.
+     */
+    {
+        // Copy buffer into programming buffer
+        uint8_t *bufPtr = mybuff;
+        uint16_t addrPtr = (uint16_t)(void*)address;
 
-	    /*
-	     * Start the page erase and wait for it to finish.  There
-	     * used to be code to do this while receiving the data over
-	     * the serial link, but the performance improvement was slight,
-	     * and we needed the space back.
-	     */
-	    do_spm((uint16_t)(void*)address,__BOOT_PAGE_ERASE,0);
+        /*
+         * Start the page erase and wait for it to finish.  There
+         * used to be code to do this while receiving the data over
+         * the serial link, but the performance improvement was slight,
+         * and we needed the space back.
+         */
+        do_spm((uint16_t)(void*)address,__BOOT_PAGE_ERASE,0);
 
-	    /*
-	     * Copy data from the buffer into the flash write buffer.
-	     */
-	    do {
-		uint16_t a;
-		a = *bufPtr++;
-		a |= (*bufPtr++) << 8;
-		do_spm((uint16_t)(void*)addrPtr,__BOOT_PAGE_FILL,a);
-		addrPtr += 2;
-	    } while (len -= 2);
+        /*
+         * Copy data from the buffer into the flash write buffer.
+         */
+        do {
+            uint16_t a;
+            a = *bufPtr++;
+            a |= (*bufPtr++) << 8;
+            do_spm((uint16_t)(void*)addrPtr,__BOOT_PAGE_FILL,a);
+            addrPtr += 2;
+        } while (len -= 2);
 
-	    /*
-	     * Actually Write the buffer to flash (and wait for it to finish.)
-	     */
-	    do_spm((uint16_t)(void*)address,__BOOT_PAGE_WRITE,0);
-	} // default block
-	break;
+        /*
+         * Actually Write the buffer to flash (and wait for it to finish.)
+         */
+        do_spm((uint16_t)(void*)address,__BOOT_PAGE_WRITE,0);
+    } // default block
+    break;
     } // switch
 }
 
@@ -955,35 +955,35 @@ static inline void read_mem(uint8_t memtype, uint16_t address, pagelen_t length)
 
 #if defined(SUPPORT_EEPROM) || defined(BIGBOOT)
     case 'E': // EEPROM
-	do {
-	    putch(eeprom_read_byte((uint8_t *)(address++)));
-	} while (--length);
-	break;
+    do {
+        putch(eeprom_read_byte((uint8_t *)(address++)));
+    } while (--length);
+    break;
 #endif
     default:
-	do {
+    do {
 #ifdef VIRTUAL_BOOT_PARTITION
         // Undo vector patch in bottom page so verify passes
-	    if (address == rstVect0) ch = rstVect0_sav;
-	    else if (address == rstVect1) ch = rstVect1_sav;
-	    else if (address == wdtVect0) ch = wdtVect0_sav;
-	    else if (address == wdtVect1) ch = wdtVect1_sav;
-	    else ch = pgm_read_byte_near(address);
-	    address++;
+        if (address == rstVect0) ch = rstVect0_sav;
+        else if (address == rstVect1) ch = rstVect1_sav;
+        else if (address == wdtVect0) ch = wdtVect0_sav;
+        else if (address == wdtVect1) ch = wdtVect1_sav;
+        else ch = pgm_read_byte_near(address);
+        address++;
 #elif defined(RAMPZ)
-	    // Since RAMPZ should already be set, we need to use EPLM directly.
-	    // Also, we can use the autoincrement version of lpm to update "address"
-	    //      do putch(pgm_read_byte_near(address++));
-	    //      while (--length);
-	    // read a Flash and increment the address (may increment RAMPZ)
-	    __asm__ ("elpm %0,Z+\n" : "=r" (ch), "=z" (address): "1" (address));
+        // Since RAMPZ should already be set, we need to use EPLM directly.
+        // Also, we can use the autoincrement version of lpm to update "address"
+        //      do putch(pgm_read_byte_near(address++));
+        //      while (--length);
+        // read a Flash and increment the address (may increment RAMPZ)
+        __asm__ ("elpm %0,Z+\n" : "=r" (ch), "=z" (address): "1" (address));
 #else
-	    // read a Flash byte and increment the address
-	    __asm__ ("lpm %0,Z+\n" : "=r" (ch), "=z" (address): "1" (address));
+        // read a Flash byte and increment the address
+        __asm__ ("lpm %0,Z+\n" : "=r" (ch), "=z" (address): "1" (address));
 #endif
-	    putch(ch);
-	} while (--length);
-	break;
+        putch(ch);
+    } while (--length);
+    break;
     } // switch
 }
 
@@ -1007,7 +1007,7 @@ static inline void read_mem(uint8_t memtype, uint16_t address, pagelen_t length)
 static void do_spm(uint16_t address, uint8_t command, uint16_t data) {
     // Do spm stuff
     asm volatile (
-	"    movw  r0, %3\n"
+    "    movw  r0, %3\n"
     "    out %0, %1\n"
     "    spm\n"
     "    clr  r1\n"
