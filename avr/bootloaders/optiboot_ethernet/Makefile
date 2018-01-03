@@ -350,7 +350,7 @@ atmega1284: TARGET = atmega1284
 atmega1284: MCU_TARGET = atmega1284
 atmega1284: CFLAGS += $(COMMON_OPTIONS) -DBIGBOOT
 atmega1284: AVR_FREQ ?= 16000000L
-atmega1284: LDSECTIONS  = -Wl,--section-start=.text=0x1fc00 -Wl,--section-start=.version=0x1fffe
+atmega1284: LDSECTIONS  = -Wl,--section-start=.text=0x1f800 -Wl,--section-start=.version=0x1fffe
 atmega1284: CFLAGS += $(UARTCMD)
 atmega1284: atmega1284/$(PROGRAM)_atmega1284_$(BAUD_RATE)_$(AVR_FREQ).hex
 atmega1284: atmega1284/$(PROGRAM)_atmega1284_$(BAUD_RATE)_$(AVR_FREQ).lst
@@ -361,7 +361,7 @@ atmega1284p: TARGET = atmega1284p
 atmega1284p: MCU_TARGET = atmega1284p
 atmega1284p: CFLAGS += $(COMMON_OPTIONS) -DBIGBOOT
 atmega1284p: AVR_FREQ ?= 16000000L
-atmega1284p: LDSECTIONS  = -Wl,--section-start=.text=0x1fc00 -Wl,--section-start=.version=0x1fffe
+atmega1284p: LDSECTIONS  = -Wl,--section-start=.text=0x1f800 -Wl,--section-start=.version=0x1fffe
 atmega1284p: CFLAGS += $(UARTCMD)
 atmega1284p: atmega1284p/$(PROGRAM)_atmega1284p_$(BAUD_RATE)_$(AVR_FREQ).hex
 atmega1284p: atmega1284p/$(PROGRAM)_atmega1284p_$(BAUD_RATE)_$(AVR_FREQ).lst
