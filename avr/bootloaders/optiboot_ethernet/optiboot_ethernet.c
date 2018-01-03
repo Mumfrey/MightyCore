@@ -340,6 +340,9 @@ void pre_main(void) __attribute__ ((naked)) __attribute__ ((section (".init8")))
 int main(void) __attribute__ ((OS_main)) __attribute__ ((section (".init9")));
 
 void __attribute__((noinline)) putch(char);
+#ifdef UART1_DEBUG
+void __attribute__((noinline)) debug(char);
+#endif
 uint8_t __attribute__((noinline)) getch(void);
 void __attribute__((noinline)) verifySpace();
 void __attribute__((noinline)) watchdogConfig(uint8_t x);
@@ -514,9 +517,22 @@ int main(void) {
   MCUSR = 0;
 #endif
 
+#ifdef UART1_DEBUG
+  UART1_SRA = _BV(U2X0); //Double speed mode USART0
+  UART1_SRB = _BV(RXEN0) | _BV(TXEN0);
+  UART1_SRC = _BV(UCSZ00) | _BV(UCSZ01);
+  UART1_SRL = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
+
+  debug(10);debug(13);
+#endif
  
   if (ch & (_BV(WDRF) | _BV(BORF) | _BV(PORF)))
-      appStart(ch);
+  {
+#ifdef UART1_DEBUG
+    debug('>');debug('>');
+#endif
+    appStart(ch);
+  }
 
 #if LED_START_FLASHES > 0
   // Set up Timer 1 for timeout counter
@@ -561,6 +577,9 @@ int main(void) {
     ch = getch();
 
     if(ch == STK_GET_PARAMETER) {
+#ifdef UART1_DEBUG
+      debug('G');
+#endif
       unsigned char which = getch();
       verifySpace();
       /*
@@ -580,14 +599,23 @@ int main(void) {
       }
     }
     else if(ch == STK_SET_DEVICE) {
+#ifdef UART1_DEBUG
+      debug('D');debug(' ');
+#endif
       // SET DEVICE is ignored
       getNch(20);
     }
     else if(ch == STK_SET_DEVICE_EXT) {
+#ifdef UART1_DEBUG
+      debug('X');debug(' ');
+#endif
       // SET DEVICE EXT is ignored
       getNch(5);
     }
     else if(ch == STK_LOAD_ADDRESS) {
+#ifdef UART1_DEBUG
+      debug('L');
+#endif
       // LOAD ADDRESS
       uint16_t newAddress;
       newAddress = getch();
@@ -601,12 +629,18 @@ int main(void) {
       verifySpace();
     }
     else if(ch == STK_UNIVERSAL) {
+#ifdef UART1_DEBUG
+      debug('U');debug(' ');
+#endif
       // UNIVERSAL command is ignored
       getNch(4);
       putch(0x00);
     }
     /* Write memory, length is big endian and is in bytes */
     else if(ch == STK_PROG_PAGE) {
+#ifdef UART1_DEBUG
+      debug('#');
+#endif
       // PROGRAM PAGE - we support flash programming only, not EEPROM
       uint8_t desttype;
       uint8_t *bufPtr;
@@ -615,6 +649,10 @@ int main(void) {
       GETLENGTH(length);
       savelength = length;
       desttype = getch();
+
+#ifdef UART1_DEBUG
+      debug(desttype);
+#endif
 
       // read a page worth of contents
       bufPtr = buff;
@@ -678,10 +716,16 @@ int main(void) {
 
       writebuffer(desttype, buff, address, savelength);
 
+#ifdef UART1_DEBUG
+      debug('!');debug(10);debug(13);
+#endif
 
     }
     /* Read memory block mode, length is big endian.  */
     else if(ch == STK_READ_PAGE) {
+#ifdef UART1_DEBUG
+      debug('<');
+#endif
       uint8_t desttype;
       GETLENGTH(length);
 
@@ -694,6 +738,9 @@ int main(void) {
 
     /* Get device signature bytes  */
     else if(ch == STK_READ_SIGN) {
+#ifdef UART1_DEBUG
+      debug('R');debug('s');debug(10);debug(13);
+#endif
       // READ SIGN - return what Avrdude wants to hear
       verifySpace();
       putch(SIGNATURE_0);
@@ -701,17 +748,30 @@ int main(void) {
       putch(SIGNATURE_2);
     }
     else if (ch == STK_LEAVE_PROGMODE) { /* 'Q' */
+#ifdef UART1_DEBUG
+      debug('Q');debug('t');debug(10);debug(13);
+#endif
       // Adaboot no-wait mod
       watchdogConfig(WATCHDOG_16MS);
       verifySpace();
     }
     else {
       // This covers the response to commands like STK_ENTER_PROGMODE
+#ifdef UART1_DEBUG
+      debug('?');debug(ch);debug(10);debug(13);
+#endif
       verifySpace();
     }
     putch(STK_OK);
   }
 }
+
+#ifdef UART1_DEBUG
+void debug(char ch) {
+  while (!(UART1_SRA & _BV(UDRE0)));
+  UART1_UDR = ch;
+}
+#endif
 
 void putch(char ch) {
 #ifndef SOFT_UART
@@ -782,6 +842,9 @@ uint8_t getch(void) {
 #else
   while(!(UART_SRA & _BV(RXC0)))
     ;
+#ifdef UART1_DEBUG
+  //debug('.');
+#endif
   if (!(UART_SRA & _BV(FE0))) {
       /*
        * A Framing Error indicates (probably) that something is talking

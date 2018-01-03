@@ -72,6 +72,15 @@
 # define UART_UDR UDR3
 #endif
 
+// UART 1 for debug
+# if defined(UDR1) && defined(UART1_DEBUG)
+# define UART1_SRA UCSR1A
+# define UART1_SRB UCSR1B
+# define UART1_SRC UCSR1C
+# define UART1_SRL UBRR1L
+# define UART1_UDR UDR1
+#endif
+
 
 #if defined(__AVR_ATmega8__) ||  defined(__AVR_ATmega8535__) || defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
   //Name conversion R.Wiersma
