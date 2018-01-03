@@ -1,3 +1,9 @@
+/**********************************************************/
+/* 2011-09-18: Extension to support W5100 by              */
+/* William R Sowerbutts <will@sowerbutts.com>             */
+/* See http://sowerbutts.com/optiboot-w5100/              */
+/**********************************************************/
+
 #define FUNC_READ 1
 #define FUNC_WRITE 1
 /**********************************************************/
@@ -233,6 +239,7 @@ optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
+#include <util/delay.h>
 
 /*
  * Note that we use our own version of "boot.h"
@@ -255,6 +262,125 @@ optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
  * stk500.h contains the constant definitions for the stk500v1 comm protocol
  */
 #include "stk500.h"
+
+/*
+ * EEPROM layout:
+ * ADDRESS _0 _1 _2 _3 _4 _5 _6 _7 _8 _9 _A _B _C _D _E _F
+ * 0x0000  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --  / -- = unused (0xFF)
+ * 0x0010  GG GG GG GG SS SS SS SS MM MM MM MM MM MM II II  / MM = MAC address; QQ = bootloader flag
+ * 0x0020  II II QQ -- -- -- -- -- -- -- -- -- -- -- -- --  / II = IPv4 address; SS = subnet mask; GG = gateway
+ *
+ * OFFSET LENGTH DESCRIPTION
+ *  0x10  4      IPv4 gateway address
+ *  0x14  4      IPv4 subnet mask
+ *  0x18  6      Ethernet MAC address
+ *  0x1E  4      IPv4 address
+ *  0x22  1      Bootloader flag
+ *
+ *  Example:
+ *
+ *  ADDRESS _0 _1 _2 _3 _4 _5 _6 _7 _8 _9 _A _B _C _D _E _F
+ *  0x0010  c0 a8 64 01 ff ff ff 00 00 16 36 de 58 f6 c0 a8 
+ *  0x0020  64 e9 55 
+ *
+ *  This configures IP address 192.168.100.233, subnet mask 255.255.255.0,
+ *  gateway 192.168.100.1, and MAC address 00:16:36:de:58:f6. Note that the
+ *  bootloader flag is set in this example.
+ *
+ */
+
+#define EEPROM_GATEWAY_OFFSET                 0x10
+#define EEPROM_SNMASK_OFFSET                  0x14
+#define EEPROM_MAC_OFFSET                     0x18
+#define EEPROM_IP_ADDR_OFFSET                 0x1E
+#define EEPROM_BOOTLOADER_FLAG_OFFSET         0x22
+#define EEPROM_BOOTLOADER_MAGIC_VALUE         0x55
+#define EEPROM_BOOTLOADER_BORING_VALUE        0xFF
+
+// W5100 registers
+#define  W5100_MR               0x0000      /* Mode Register */
+#define  W5100_GAR              0x0001      /* Gateway Address: 0x0001 to 0x0004 */
+#define  W5100_SUBR             0x0005      /* Subnet mask Address: 0x0005 to 0x0008 */
+#define  W5100_SHAR             0x0009      /* Source Hardware Address (MAC): 0x0009 to 0x000E */
+#define  W5100_SIPR             0x000F      /* Source IP Address: 0x000F to 0x0012 */
+#define  W5100_IMR              0x0016      /* Interrupt Mask Register */
+#define  W5100_SKT_REG_BASE     0x0400      /* start of socket registers */
+#define  W5100_SKT_OFFSET       0x0100      /* offset to each socket regester set */
+#define  W5100_SKT_BASE(n)      (W5100_SKT_REG_BASE+(n*W5100_SKT_OFFSET))
+
+// socket register offsets
+#define  W5100_MR_OFFSET        0x0000      /* socket Mode Register offset */
+#define  W5100_CR_OFFSET        0x0001      /* socket Command Register offset */
+#define  W5100_IR_OFFSET        0x0002      /* socket Interrupt Register offset */
+#define  W5100_SR_OFFSET        0x0003      /* socket Status Register offset */
+#define  W5100_PORT_OFFSET      0x0004      /* socket Port Register offset (2 bytes) */
+#define  W5100_DHAR_OFFSET      0x0006      /* socket Destination Hardware Address Register (MAC, 6 bytes) */
+#define  W5100_DIPR_OFFSET      0x000C      /* socket Destination IP Address Register (IP, 4 bytes) */
+#define  W5100_DPORT_OFFSET     0x0010      /* socket Destination Port Register (2 bytes) */
+#define  W5100_MSS_OFFSET       0x0012      /* socket Maximum Segment Size (2 bytes) */
+#define  W5100_PROTO_OFFSET     0x0014      /* socket IP Protocol Register */
+#define  W5100_TOS_OFFSET       0x0015      /* socket Type Of Service Register */
+#define  W5100_TTL_OFFSET       0x0016      /* socket Time To Live Register */
+#define  W5100_TX_FSR_OFFSET    0x0020      /* socket Transmit Free Size Register (2 bytes) */
+#define  W5100_TX_RR_OFFSET     0x0022      /* socket Transmit Read Pointer Register (2 bytes) */
+#define  W5100_TX_WR_OFFSET     0x0024      /* socket Transmit Write Pointer Register (2 bytes) */
+#define  W5100_RX_RSR_OFFSET    0x0026      /* socket Receive Received Size Register (2 bytes) */
+#define  W5100_RX_RD_OFFSET     0x0028      /* socket Receive Read Pointer Register (2 bytes) */
+
+// Device Mode Register
+#define  W5100_MR_SOFTRST       (1<<7)      /* soft-reset */
+#define  W5100_MR_PINGBLK       (1<<4)      /* block responses to ping request */
+#define  W5100_MR_PPPOE         (1<<3)      /* enable PPPoE */
+#define  W5100_MR_AUTOINC       (1<<1)      /* address autoincrement (indirect interface ONLY!) */
+#define  W5100_MR_INDINT        (1<<0)      /* use indirect interface (parallel interface ONLY!) */
+
+// Socket mode register
+#define  W5100_SKT_MR_CLOSE     0x00        /* Unused socket */
+#define  W5100_SKT_MR_TCP       0x01        /* TCP */
+#define  W5100_SKT_MR_UDP       0x02        /* UDP */
+#define  W5100_SKT_MR_IPRAW     0x03        /* IP LAYER RAW SOCK */
+#define  W5100_SKT_MR_MACRAW    0x04        /* MAC LAYER RAW SOCK */
+#define  W5100_SKT_MR_PPPOE     0x05        /* PPPoE */
+#define  W5100_SKT_MR_ND        0x20        /* No Delayed Ack(TCP) flag */
+#define  W5100_SKT_MR_MULTI     0x80        /* support multicasting */
+
+// Socket command register
+#define  W5100_SKT_CR_OPEN      0x01        /* open the socket */
+#define  W5100_SKT_CR_LISTEN    0x02        /* wait for TCP connection (server mode) */
+#define  W5100_SKT_CR_CONNECT   0x04        /* listen for TCP connection (client mode) */
+#define  W5100_SKT_CR_DISCON    0x08        /* close TCP connection */
+#define  W5100_SKT_CR_CLOSE     0x10        /* mark socket as closed (does not close TCP connection) */
+#define  W5100_SKT_CR_SEND      0x20        /* transmit data in TX buffer */
+#define  W5100_SKT_CR_SEND_MAC  0x21        /* SEND, but uses destination MAC address (UDP only) */
+#define  W5100_SKT_CR_SEND_KEEP 0x22        /* SEND, but sends 1-byte packet for keep-alive (TCP only) */
+#define  W5100_SKT_CR_RECV      0x40        /* receive data into RX buffer */
+
+// Socket status register
+#define  W5100_SKT_SR_CLOSED      0x00      /* closed */
+#define  W5100_SKT_SR_INIT        0x13      /* init state */
+#define  W5100_SKT_SR_LISTEN      0x14      /* listen state */
+#define  W5100_SKT_SR_SYNSENT     0x15      /* connection state */
+#define  W5100_SKT_SR_SYNRECV     0x16      /* connection state */
+#define  W5100_SKT_SR_ESTABLISHED 0x17      /* success to connect */
+#define  W5100_SKT_SR_FIN_WAIT    0x18      /* closing state */
+#define  W5100_SKT_SR_CLOSING     0x1A      /* closing state */
+#define  W5100_SKT_SR_TIME_WAIT   0x1B      /* closing state */
+#define  W5100_SKT_SR_CLOSE_WAIT  0x1C      /* closing state */
+#define  W5100_SKT_SR_LAST_ACK    0x1D      /* closing state */
+#define  W5100_SKT_SR_UDP         0x22      /* UDP socket */
+#define  W5100_SKT_SR_IPRAW       0x32      /* IP raw mode socket */
+#define  W5100_SKT_SR_MACRAW      0x42      /* MAC raw mode socket */
+#define  W5100_SKT_SR_PPPOE       0x5F      /* PPPOE socket */
+
+// TX and RX buffers
+#define  W5100_TXBUFADDR        0x4000      /* W5100 Send Buffer Base Address */
+#define  W5100_RXBUFADDR        0x6000      /* W5100 Read Buffer Base Address */
+#define  W5100_BUFSIZE          0x0800      /* W5100 buffers are sized 2K */
+#define  W5100_TX_BUF_MASK      0x07FF      /* Tx 2K Buffer Mask */
+#define  W5100_RX_BUF_MASK      0x07FF      /* Rx 2K Buffer Mask */
+
+#define W5100_WRITE_OPCODE          0xF0
+#define W5100_READ_OPCODE           0x0F
 
 #ifndef LED_START_FLASHES
 #define LED_START_FLASHES 0
@@ -338,6 +464,8 @@ typedef uint8_t pagelen_t;
 
 void pre_main(void) __attribute__ ((naked)) __attribute__ ((section (".init8")));
 int main(void) __attribute__ ((OS_main)) __attribute__ ((section (".init9")));
+
+void ethernet_init(void);
 
 void __attribute__((noinline)) putch(char);
 #ifdef UART1_DEBUG
@@ -462,6 +590,9 @@ void appStart(uint8_t rstFlags) __attribute__ ((naked));
 #define appstart_vec (0)
 #endif // VIRTUAL_BOOT_PARTITION
 
+#define ethernet_mode  (*(uint8_t*)(RAMSTART+SPM_PAGESIZE*2+8)) // mode flag. non-zero for ethernet mode, zero for serial mode.
+#define sync_sink  (*(uint8_t*)(RAMSTART+SPM_PAGESIZE*2+9)) // sync sink
+
 /* everything that needs to run VERY early */
 void pre_main(void) {
   // Allow convenient way of calling do_spm function - jump table,
@@ -525,6 +656,26 @@ int main(void) {
 
   debug(10);debug(13);
 #endif
+
+  // Check whether we should enter ethernet mode
+  if (eeprom_read_byte((uint8_t*)EEPROM_BOOTLOADER_FLAG_OFFSET) == EEPROM_BOOTLOADER_MAGIC_VALUE) {
+    eeprom_write_byte((uint8_t*)EEPROM_BOOTLOADER_FLAG_OFFSET, EEPROM_BOOTLOADER_BORING_VALUE); // unset flag so we boot normally next time around
+#ifdef UART1_DEBUG
+    debug('N');debug('E');debug('T');
+#endif
+    
+    watchdogConfig(WATCHDOG_8S);
+    ethernet_init();
+
+    ethernet_mode = 1;
+    sync_sink = 0;
+    ch = 0;
+  } else {
+#ifdef UART1_DEBUG
+    debug('S');debug('T');debug('D');
+#endif
+    ethernet_mode = 0;
+  }
  
   if (ch & (_BV(WDRF) | _BV(BORF) | _BV(PORF)))
   {
@@ -763,6 +914,108 @@ int main(void) {
       verifySpace();
     }
     putch(STK_OK);
+    
+    // For all other requests rather than STK_GET_SYNC, reset sync req state
+    sync_sink = 0;
+  }
+}
+
+uint8_t W51_xfer(uint16_t addr, uint8_t data, uint8_t opcode)
+{
+  PORTB &= ~(_BV(PINB4));        // Make SPI SS low
+  SPDR = opcode;
+  while (!(SPSR & _BV(SPIF))); // wait for SPI
+  SPDR = addr >> 8;
+  while (!(SPSR & _BV(SPIF))); // wait for SPI
+  SPDR = addr & 0xff;
+  while (!(SPSR & _BV(SPIF))); // wait for SPI
+  SPDR = data;
+  while (!(SPSR & _BV(SPIF))); // wait for SPI
+  PORTB |= (_BV(PINB4));         // Make SPI SS high
+  return SPDR;
+}
+
+void W51_write(uint16_t addr, uint8_t data)
+{
+  W51_xfer(addr, data, W5100_WRITE_OPCODE);
+}
+
+uint8_t W51_read(uint16_t addr)
+{
+  return W51_xfer(addr, 0, W5100_READ_OPCODE);
+}
+
+void W51_write16(uint16_t addr, uint16_t data)
+{
+  W51_write(addr, data >> 8);     // write MSB
+  W51_write(addr+1, data & 0xFF); // write LSB
+}
+
+uint16_t W51_read16(uint16_t addr)
+{
+  uint16_t val;
+
+  val = W51_read(addr) << 8;  // read MSB (must be read first)
+  val |= W51_read(addr+1);    // read LSB
+
+  return val;
+}
+
+void W51_execute(uint16_t cmd)
+{
+  W51_write(W5100_SKT_BASE(0) + W5100_CR_OFFSET, cmd);
+  while(W51_read(W5100_SKT_BASE(0) + W5100_CR_OFFSET));
+}
+
+void ethernet_init(void)
+{
+  // prepare SPI
+  PORTB |= _BV(PORTB4);                         // make sure SS is high
+  DDRB = _BV(PORTB4) | _BV(PORTB5) | _BV(PORTB7);   // set MOSI, SCK and SS as output, others as input
+  SPCR = _BV(SPE) | _BV(MSTR);                    // enable SPI, master mode 0
+  // omitting this saves 6 bytes, and it's not like we're a high performance system...
+  SPSR |= _BV(SPI2X);                           // enable SPI double speed clock
+
+  // wait for ethernet chip to initialise
+  _delay_ms(10); // datasheet says max 10ms but I have seen figures up to 300ms elsewhere.
+
+  W51_write(W5100_MR, W5100_MR_SOFTRST);      // force the w5100 to soft-reset
+  _delay_ms(10);                               // wait for chip to reset
+
+  // use 2K buffers for RX/TX for each socket.
+  // W51_write(W5100_RMSR, 0x55);  -- pointless; W5100_MR_SOFTRST does this
+  // W51_write(W5100_TMSR, 0x55);  -- pointless; W5100_MR_SOFTRST does this
+  
+  // I laid out the config in EEPROM to match the registers in the W5100.
+  // doing it this way saves a bunch of instructions!
+  uint8_t r, w;
+
+  r = EEPROM_GATEWAY_OFFSET;
+  w = W5100_GAR;
+  do{
+    W51_write(w, eeprom_read_byte((uint8_t*)((uint16_t)r)));
+    w++;
+    r++;
+  }while(r < EEPROM_BOOTLOADER_FLAG_OFFSET);
+
+  // put socket 0 into listen mode
+  W51_write(W5100_SKT_BASE(0) + W5100_MR_OFFSET, W5100_SKT_MR_TCP);
+  W51_write(W5100_SKT_BASE(0) + W5100_PORT_OFFSET + 0, 0x11); // port 0x11d0 = 4560
+  W51_write(W5100_SKT_BASE(0) + W5100_PORT_OFFSET + 1, 0xd0);
+  W51_execute(W5100_SKT_CR_OPEN);
+  // ... assume success
+  W51_execute(W5100_SKT_CR_LISTEN);
+  // ... assume success
+
+  // now wait for an incoming connection -- may take a while; watchdog will reset us if
+  // no connection arrives.
+  uint16_t a = 0xffff;
+  while(a) {
+    watchdogReset();
+    if (W51_read(W5100_SKT_BASE(0) + W5100_SR_OFFSET) == W5100_SKT_SR_ESTABLISHED)
+      break;
+    _delay_ms(9); // 0xffff * 9 == 589 sec
+    a--;
   }
 }
 
@@ -775,8 +1028,26 @@ void debug(char ch) {
 
 void putch(char ch) {
 #ifndef SOFT_UART
+  if (ethernet_mode) {
+    // write to w5100
+    // wait for space in buffer
+    while(W51_read16(W5100_SKT_BASE(0) + W5100_TX_FSR_OFFSET) == 0);
+    
+    uint16_t tx_ptr;
+    tx_ptr = W51_read16(W5100_SKT_BASE(0) + W5100_TX_WR_OFFSET);
+    
+    W51_write(W5100_TXBUFADDR + (tx_ptr & W5100_TX_BUF_MASK), ch);
+    tx_ptr++;
+    
+    W51_write16(W5100_SKT_BASE(0) + W5100_TX_WR_OFFSET, tx_ptr);
+    W51_execute(W5100_SKT_CR_SEND);
+  } else {
+  
+  // read from uart
   while (!(UART_SRA & _BV(UDRE0)));
   UART_UDR = ch;
+
+  }
 #else
   __asm__ __volatile__ (
     "   com %[ch]\n" // ones complement, carry set
@@ -840,6 +1111,23 @@ uint8_t getch(void) {
       "r25"
 );
 #else
+  if (ethernet_mode) {
+    while (W51_read16(W5100_SKT_BASE(0) + W5100_RX_RSR_OFFSET) == 0);
+    // load single byte from ethernet device
+    uint16_t rx_ptr;
+    rx_ptr = W51_read16(W5100_SKT_BASE(0) + W5100_RX_RD_OFFSET);
+    
+    ch = W51_read(W5100_RXBUFADDR + (rx_ptr & W5100_RX_BUF_MASK));
+    
+    W51_write16(W5100_SKT_BASE(0) + W5100_RX_RD_OFFSET, rx_ptr+1);
+    W51_execute(W5100_SKT_CR_RECV);
+    
+#ifdef UART1_DEBUG
+    //debug('.');
+#endif
+    watchdogReset();
+  } else {
+  
   while(!(UART_SRA & _BV(RXC0)))
     ;
 #ifdef UART1_DEBUG
@@ -858,6 +1146,9 @@ uint8_t getch(void) {
   }
 
   ch = UART_UDR;
+  
+  }
+
 #endif
 
 #ifdef LED_DATA_FLASH
