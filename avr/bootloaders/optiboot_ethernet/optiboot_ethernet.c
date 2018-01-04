@@ -905,6 +905,26 @@ int main(void) {
       // Adaboot no-wait mod
       watchdogConfig(WATCHDOG_16MS);
       verifySpace();
+    } 
+    else if (ch == STK_GET_SYNC && ethernet_mode) {
+#ifdef UART1_DEBUG
+      debug('$');
+#endif
+      // avrdude sends 3 sync requests but will begin processing on
+      // the first reply it receives, make sure we only reply with
+      // one STK_OK+STK_INSYNC ack otherwise avrdude will treat the
+      // other replies as the start of the normal reply payload and
+      // immediately fail!
+      if (sync_sink++ == 2) {
+#ifdef UART1_DEBUG
+        debug('~');debug(10);debug(13);
+#endif
+        verifySpace();
+        putch(STK_OK);
+        continue;
+      }
+      getch();
+      continue;
     }
     else {
       // This covers the response to commands like STK_ENTER_PROGMODE
