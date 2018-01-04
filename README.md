@@ -10,6 +10,11 @@ If you're into "pure" AVR programming, I'm happy to tell you that all relevant k
 If you're looking for a great development board for these DIP-40 microcontrollers, I got you covered! I've used the Arduino UNO for years,
 but felt like some functionality was missing on the board. When designing this board I made sure all missing functionality was added. [The board can be bought on my Tindie store](https://www.tindie.com/products/MCUdude/dip-40-arduino-compatible-development-board).
 Read more in the hardware section below.
+<br/><br/>
+### About this particular fork
+> Note that **this fork** is purely for the purposes of integrating **the [AVR Bootloader with Wiznet W5100 ethernet support](http://sowerbutts.com/optiboot-w5100/)** made by [William R Sowerbutts](http://sowerbutts.com/) into [MightyCore](https://github.com/mcudude/mightycore) **specifically for the Atmega1284P** so most of the changes here have only been made to support that chip and would need expanding upon in order to work with other chips.
+>
+> If you're not looking for an ethernet-enabled version of optiboot with MightyCore, then you should be looking at [the main repo](https://github.com/mcudude/mightycore) instead.
 
 
 # Table of contents
@@ -21,14 +26,15 @@ Read more in the hardware section below.
 * [Programmers](#programmers)
 * [Write to own flash](#write-to-own-flash)
 * **[How to install](#how-to-install)**
-	- [Boards Manager Installation](#boards-manager-installation)
-	- [Manual Installation](#manual-installation)
-	- [PlatformIO](#platformio)
+    - [Boards Manager Installation](#boards-manager-installation)
+    - [Manual Installation](#manual-installation)
+    - [PlatformIO](#platformio)
 * **[Getting started with MightyCore](#getting-started-with-mightycore)**
-* [Wiring reference](#wiring-reference)	
-* [Library porting](#library-porting)	
-* [Hardware](#hardware)	
+* [Wiring reference](#wiring-reference) 
+* [Library porting](#library-porting)   
+* [Hardware](#hardware) 
 * **[Minimal setup](#minimal-setup)**
+* [About Ethernet Boot](#about-ethernet-boot)   
 
 
 ## Supported microcontrollers
@@ -155,7 +161,7 @@ Open Arduino IDE, and a new category in the boards menu called "MightyCore" will
 ## Getting started with MightyCore
 Ok, so you've downloaded and installed MightyCore, but how do you get the wheels spinning? Here's a quick start guide:
 * Hook up your microcontroller as shown in the [pinout diagram](#pinout).
-	- If you're not planning to use the bootloader (uploading code using a USB to serial adapter), the FTDI header and the 100 nF capacitor on the reset pin can be omitted. 
+    - If you're not planning to use the bootloader (uploading code using a USB to serial adapter), the FTDI header and the 100 nF capacitor on the reset pin can be omitted. 
 * Open the **Tools > Board** menu item, and select a MighyCore compatible microcontroller.
 * If the *BOD option* is presented, you can select at what voltage the microcontroller will shut down at. Read more about BOD [here](#bod-option).
 * Select your prefered pinout. Personally I prefer the standard pinout because it's "cleaner", but the Bobuino pinout is better at Arduino UNO pin compatibility. Read more about the different pinouts [here](#pinouts).
@@ -164,8 +170,8 @@ Ok, so you've downloaded and installed MightyCore, but how do you get the wheels
 * If the *Variants* option is presented, you'll have to specify what version of the microcontroller you're using. E.g the ATmega1284 and the ATmega1284P have different device signatures, so selecting the wrong one will result in an error.
 * Hit **Burn Bootloader**. If an LED is connected to pin PB0, it should flash twice every second.
 * Now that the correct fuse settings is set and the bootloader burnt, you can upload your code in two ways:
-	- Disconnect your programmer tool, and connect a USB to serial adapter to the microcontroller, like shown in the [minimal setup circuit](#minimal-setup). Then select the correct serial port under the **Tools** menu, and click the **Upload** button. If you're getting some kind of timeout error, it means your RX and TX pins are swapped, or your auto reset circuity isn't working properly (the 100 nF capacitor on the reset line).
-	- Keep your programmer connected, and hold down the `shift` button while clicking **Upload**. This will erase the bootloader and upload your code using the programmer tool.
+    - Disconnect your programmer tool, and connect a USB to serial adapter to the microcontroller, like shown in the [minimal setup circuit](#minimal-setup). Then select the correct serial port under the **Tools** menu, and click the **Upload** button. If you're getting some kind of timeout error, it means your RX and TX pins are swapped, or your auto reset circuity isn't working properly (the 100 nF capacitor on the reset line).
+    - Keep your programmer connected, and hold down the `shift` button while clicking **Upload**. This will erase the bootloader and upload your code using the programmer tool.
 
 Your code should now be running on your microcontroller! If you experience any issues related to bootloader burning or serial uploading, please use *[this forum post](https://forum.arduino.cc/index.php?topic=379427.0)* or create an issue on Github.
 
@@ -181,7 +187,7 @@ I hope you find this useful, because they really are!
 * sleepMode()
 * sleep()
 * noSleep()
-* enablePower()	
+* enablePower() 
 * disablePower()
 
 ### For further information please view the [Wiring reference page](https://github.com/MCUdude/MightyCore/blob/master/Wiring_reference.md)!
@@ -226,3 +232,28 @@ Click the images for full resolution <br/>
 ## Minimal setup
 Here is a simple schematic showing a minimal setup using an external crystal. Skip the crystal and the two capacitors if you're using the internal oscillator. <br/>
 <img src="http://i.imgur.com/sfeTDsZ.png" width="750">
+
+##About Ethernet Boot
+
+Most of the relevant information for using the ethernet bootloader can be found on [William Sowerbutts' project page at sowerbutts.com](http://sowerbutts.com/optiboot-w5100/). However as William states in his article:
+
+> I've never used the Arduino software suite. I use the excellent [`avr-libc`](http://www.nongnu.org/avr-libc/) together with `avr-binutils` and` avr-gcc`. It seems that the Arduino project uses these same tools so perhaps this will be useful to Arduino users too. 
+
+So the following should be noted when using ethernet uploading with the Arduino IDE:
+
+* It's actually pretty straightforward to get ethernet uploading directly supported within the IDE since the only parameter that needs to be changed is the serial port. Rather than specifying the serial port as `COM1`, specify the serial port as `net:<ip>:<port>` instead.
+ 
+ This can be achieved by directly editing the avrdude patterns in the MightyCore `platform.txt` file, or if you are really keen then it's pretty trivial to edit the Arduino IDE (it's Java) to add support for a selectable virtual serial port within the GUI, this allows you to switch back and forth between serial and tcp uploading much more quickly.
+ 
+ However you choose to proceed, once uploading is impleted in the IDE you simply need to trigger the ethernet bootloader mode and hit the "Upload" button in the IDE. I simply edited the IDE to also send the required signal to my device before commencing upload.
+
+* I had to tweak William's code slightly in order to make it work with `avrdude` in its current form. I'm not sure whether the change was required because of changes to avrdude since William's implementation, or because of differences between the original avr utilities and the ones shipped by Arduino.
+ 
+ I discovered that `avrdude` sends 3 `STK_GET_SYNC` requests when beginning upload, and in the original form the bootloader would reply to all 3 with `STK_INSYNC` + `STK_OK`. This lead to the situation where `avrdude` would not receive the responses until *after* the 3rd packet was sent, and it would perceive the *first* reply as a reply to the *third* request. This meant that it would interpret the subsequent `STK_INSYNC` + `STK_OK` pairs as replies to its initial `STK_GET_PARAMETER` requests.
+ 
+ The solution I have implemented for this problem is to discard consecutive `STK_GET_SYNC` requests when in ethernet mode and only reply to the *third* request. A better solution might be to reply to the *first* request and ignore subsequent requests, however the main reason for using the 3rd request is that it faithfully replicates what's going on from `avrdude`'s point of view (eg. the first two requests are unanswered and the third succeeds). If this behaviour turns out to be timing dependent then I may change it back to replying to the first request.
+
+* I have also extended the bootloader to read the listen port from the EEPROM, allowing the application to determine which port to initiate bootloader commication on. The port bytes follow the "magic number" in William's original EEPROM layout scheme.
+
+* For simplicity I have discarded the `FAST_BUT_FAT` option from William's bootloader because testing shows the base version to be about 50% faster than USB upload anyway, and it makes the code easier to port and merge with newer Optiboot versions in the future because it reduces the source code footprint
+
