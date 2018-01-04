@@ -233,7 +233,7 @@ Click the images for full resolution <br/>
 Here is a simple schematic showing a minimal setup using an external crystal. Skip the crystal and the two capacitors if you're using the internal oscillator. <br/>
 <img src="http://i.imgur.com/sfeTDsZ.png" width="750">
 
-##About Ethernet Boot
+## About Ethernet Boot
 
 Most of the relevant information for using the ethernet bootloader can be found on [William Sowerbutts' project page at sowerbutts.com](http://sowerbutts.com/optiboot-w5100/). However as William states in his article:
 
@@ -242,10 +242,10 @@ Most of the relevant information for using the ethernet bootloader can be found 
 So the following should be noted when using ethernet uploading with the Arduino IDE:
 
 * It's actually pretty straightforward to get ethernet uploading directly supported within the IDE since the only parameter that needs to be changed is the serial port. Rather than specifying the serial port as `COM1`, specify the serial port as `net:<ip>:<port>` instead.
- 
- This can be achieved by directly editing the avrdude patterns in the MightyCore `platform.txt` file, or if you are really keen then it's pretty trivial to edit the Arduino IDE (it's Java) to add support for a selectable virtual serial port within the GUI, this allows you to switch back and forth between serial and tcp uploading much more quickly.
- 
- However you choose to proceed, once uploading is impleted in the IDE you simply need to trigger the ethernet bootloader mode and hit the "Upload" button in the IDE. I simply edited the IDE to also send the required signal to my device before commencing upload.
+  
+  This can be achieved by directly editing the avrdude patterns in the MightyCore `platform.txt` file, or if you are really keen then it's pretty trivial to edit the Arduino IDE (it's Java) to add support for a selectable virtual serial port within the GUI, this allows you to switch back and forth between serial and tcp uploading much more quickly.
+  
+  However you choose to proceed, once uploading is impleted in the IDE you simply need to trigger the ethernet bootloader mode and hit the "Upload" button in the IDE. I simply edited the IDE to also send the required signal to my device before commencing upload.
 
 * I had to tweak William's code slightly in order to make it work with `avrdude` in its current form. I'm not sure whether the change was required because of changes to avrdude since William's implementation, or because of differences between the original avr utilities and the ones shipped by Arduino.
  
