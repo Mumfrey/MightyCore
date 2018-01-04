@@ -18,7 +18,6 @@ menu.variant=Variant
 menu.LTO=Compiler LTO
 menu.loader_type=Bootloader
 
-
 ######################
 #### ATmega1284/P ####
 ######################
@@ -60,12 +59,19 @@ menu.loader_type=Bootloader
 # Bootloader type
 1284.menu.loader_type.flash=Optiboot (Flash)
 1284.menu.loader_type.flash.loader.name=optiboot_flash
+1284.menu.loader_type.flash.loader.suffix=
 1284.menu.loader_type.flash.bootloader.high_fuses=0xd6
 1284.menu.loader_type.flash.upload.maximum_size=130048
 1284.menu.loader_type.ethernet=Optiboot (Flash + Ethernet)
 1284.menu.loader_type.ethernet.loader.name=optiboot_ethernet
+1284.menu.loader_type.ethernet.loader.suffix=
 1284.menu.loader_type.ethernet.bootloader.high_fuses=0xd4
 1284.menu.loader_type.ethernet.upload.maximum_size=129024
+1284.menu.loader_type.ethernet_dbg=Optiboot (Flash + Ethernet + Debug via UART1)
+1284.menu.loader_type.ethernet_dbg.loader.name=optiboot_ethernet
+1284.menu.loader_type.ethernet_dbg.loader.suffix=_dbg
+1284.menu.loader_type.ethernet_dbg.bootloader.high_fuses=0xd4
+1284.menu.loader_type.ethernet_dbg.upload.maximum_size=129024
 
 # Compiler link time optimization
 1284.menu.LTO.Os=Disabled (default)
@@ -84,43 +90,43 @@ menu.loader_type=Bootloader
 1284.menu.clock.16MHz_external=16 MHz external
 1284.menu.clock.16MHz_external.upload.speed=115200
 1284.menu.clock.16MHz_external.bootloader.low_fuses=0xf7
-1284.menu.clock.16MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}.hex
+1284.menu.clock.16MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}{loader.suffix}.hex
 1284.menu.clock.16MHz_external.build.f_cpu=16000000L
 
 1284.menu.clock.20MHz_external=20 MHz external
 1284.menu.clock.20MHz_external.upload.speed=115200
 1284.menu.clock.20MHz_external.bootloader.low_fuses=0xf7
-1284.menu.clock.20MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}.hex
+1284.menu.clock.20MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}{loader.suffix}.hex
 1284.menu.clock.20MHz_external.build.f_cpu=20000000L
 
 1284.menu.clock.18_432MHz_external=18.432 MHz external
 1284.menu.clock.18_432MHz_external.upload.speed=115200
 1284.menu.clock.18_432MHz_external.bootloader.low_fuses=f7
-1284.menu.clock.18_432MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}.hex
+1284.menu.clock.18_432MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}{loader.suffix}.hex
 1284.menu.clock.18_432MHz_external.build.f_cpu=18432000L
 
 1284.menu.clock.12MHz_external=12 MHz external
 1284.menu.clock.12MHz_external.upload.speed=57600
 1284.menu.clock.12MHz_external.bootloader.low_fuses=0xf7
-1284.menu.clock.12MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}.hex
+1284.menu.clock.12MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}{loader.suffix}.hex
 1284.menu.clock.12MHz_external.build.f_cpu=12000000L
 
 1284.menu.clock.8MHz_external=8 MHz external
 1284.menu.clock.8MHz_external.upload.speed=57600
 1284.menu.clock.8MHz_external.bootloader.low_fuses=0xf7
-1284.menu.clock.8MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}.hex
+1284.menu.clock.8MHz_external.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}{loader.suffix}.hex
 1284.menu.clock.8MHz_external.build.f_cpu=8000000L
 
 1284.menu.clock.8MHz_internal=8 MHz internal
 1284.menu.clock.8MHz_internal.upload.speed=38400
 1284.menu.clock.8MHz_internal.bootloader.low_fuses=0xe2
-1284.menu.clock.8MHz_internal.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}.hex
+1284.menu.clock.8MHz_internal.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}{loader.suffix}.hex
 1284.menu.clock.8MHz_internal.build.f_cpu=8000000L
 
 1284.menu.clock.1MHz_internal=1 MHz internal
 1284.menu.clock.1MHz_internal.upload.speed=9600
 1284.menu.clock.1MHz_internal.bootloader.low_fuses=0x62
-1284.menu.clock.1MHz_internal.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}.hex
+1284.menu.clock.1MHz_internal.bootloader.file={loader.name}/{build.mcu}/{loader.name}_{build.mcu}_{upload.speed}_{build.f_cpu}{loader.suffix}.hex
 1284.menu.clock.1MHz_internal.build.f_cpu=1000000L
 
 

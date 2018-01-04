@@ -183,7 +183,10 @@ endif
 
 ifdef UART1_DEBUG
 UART1_CMD = -DUART1_DEBUG=1
+SUFFIX = _dbg
 dummy = FORCE
+else
+SUFFIX = 
 endif
 
 COMMON_OPTIONS = $(BAUD_RATE_CMD) $(LED_START_FLASHES_CMD) $(BIGBOOT_CMD)
@@ -237,8 +240,8 @@ atmega8535: MCU_TARGET = atmega8535
 atmega8535: CFLAGS += $(COMMON_OPTIONS)
 atmega8535: AVR_FREQ ?= 16000000L
 atmega8535: LDSECTIONS = -Wl,--section-start=.text=0x1e00 -Wl,--section-start=.version=0x1ffe
-atmega8535: atmega8535/$(PROGRAM)_atmega8535_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega8535: atmega8535/$(PROGRAM)_atmega8535_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega8535: atmega8535/$(PROGRAM)_atmega8535_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega8535: atmega8535/$(PROGRAM)_atmega8535_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega8535a: atmega8535
 
 
@@ -248,8 +251,8 @@ atmega16: MCU_TARGET = atmega16
 atmega16: CFLAGS += $(COMMON_OPTIONS)
 atmega16: AVR_FREQ ?= 16000000L
 atmega16: LDSECTIONS  = -Wl,--section-start=.text=0x3e00 -Wl,--section-start=.version=0x3ffe
-atmega16: atmega16/$(PROGRAM)_atmega16_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega16: atmega16/$(PROGRAM)_atmega16_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega16: atmega16/$(PROGRAM)_atmega16_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega16: atmega16/$(PROGRAM)_atmega16_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega16a: atmega16
 
 
@@ -259,8 +262,8 @@ atmega32: MCU_TARGET = atmega32
 atmega32: CFLAGS += $(COMMON_OPTIONS)
 atmega32: AVR_FREQ ?= 16000000L
 atmega32: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
-atmega32: atmega32/$(PROGRAM)_atmega32_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega32: atmega32/$(PROGRAM)_atmega32_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega32: atmega32/$(PROGRAM)_atmega32_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega32: atmega32/$(PROGRAM)_atmega32_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega32a: atmega32
 
 
@@ -271,8 +274,8 @@ atmega164a: CFLAGS += $(COMMON_OPTIONS)
 atmega164a: AVR_FREQ ?= 16000000L
 atmega164a: LDSECTIONS  = -Wl,--section-start=.text=0x3e00
 atmega164a: CFLAGS += $(UARTCMD)
-atmega164a: atmega164a/$(PROGRAM)_atmega164a_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega164a: atmega164a/$(PROGRAM)_atmega164a_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega164a: atmega164a/$(PROGRAM)_atmega164a_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega164a: atmega164a/$(PROGRAM)_atmega164a_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega164: atmega164a
 
 
@@ -283,8 +286,8 @@ atmega164p: CFLAGS += $(COMMON_OPTIONS)
 atmega164p: AVR_FREQ ?= 16000000L
 atmega164p: LDSECTIONS  = -Wl,--section-start=.text=0x3e00
 atmega164p: CFLAGS += $(UARTCMD)
-atmega164p: atmega164p/$(PROGRAM)_atmega164p_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega164p: atmega164p/$(PROGRAM)_atmega164p_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega164p: atmega164p/$(PROGRAM)_atmega164p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega164p: atmega164p/$(PROGRAM)_atmega164p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega164pa: atmega164p
 
 
@@ -295,8 +298,8 @@ atmega324a: CFLAGS += $(COMMON_OPTIONS)
 atmega324a: AVR_FREQ ?= 16000000L
 atmega324a: LDSECTIONS  = -Wl,--section-start=.text=0x7e00
 atmega324a: CFLAGS += $(UARTCMD)
-atmega324a: atmega324a/$(PROGRAM)_atmega324a_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega324a: atmega324a/$(PROGRAM)_atmega324a_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega324a: atmega324a/$(PROGRAM)_atmega324a_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega324a: atmega324a/$(PROGRAM)_atmega324a_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega324: atmega324a
 
 
@@ -307,8 +310,8 @@ atmega324p: CFLAGS += $(COMMON_OPTIONS)
 atmega324p: AVR_FREQ ?= 16000000L
 atmega324p: LDSECTIONS  = -Wl,--section-start=.text=0x7e00
 atmega324p: CFLAGS += $(UARTCMD)
-atmega324p: atmega324p/$(PROGRAM)_atmega324p_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega324p: atmega324p/$(PROGRAM)_atmega324p_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega324p: atmega324p/$(PROGRAM)_atmega324p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega324p: atmega324p/$(PROGRAM)_atmega324p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 
 
 # ATmega324PA
@@ -318,8 +321,8 @@ atmega324pa: CFLAGS += $(COMMON_OPTIONS)
 atmega324pa: AVR_FREQ ?= 16000000L
 atmega324pa: LDSECTIONS  = -Wl,--section-start=.text=0x7e00
 atmega324pa: CFLAGS += $(UARTCMD)
-atmega324pa: atmega324pa/$(PROGRAM)_atmega324pa_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega324pa: atmega324pa/$(PROGRAM)_atmega324pa_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega324pa: atmega324pa/$(PROGRAM)_atmega324pa_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega324pa: atmega324pa/$(PROGRAM)_atmega324pa_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 
 
 # ATmega644/A
@@ -329,8 +332,8 @@ atmega644: CFLAGS += $(COMMON_OPTIONS) -DBIGBOOT
 atmega644: AVR_FREQ ?= 16000000L
 atmega644: LDSECTIONS  = -Wl,--section-start=.text=0xfc00 -Wl,--section-start=.version=0xfffe
 atmega644: CFLAGS += $(UARTCMD)
-atmega644: atmega644/$(PROGRAM)_atmega644_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega644: atmega644/$(PROGRAM)_atmega644_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega644: atmega644/$(PROGRAM)_atmega644_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega644: atmega644/$(PROGRAM)_atmega644_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega644a: atmega644
 
 # ATmega644P/PA
@@ -340,8 +343,8 @@ atmega644p: CFLAGS += $(COMMON_OPTIONS) -DBIGBOOT
 atmega644p: AVR_FREQ ?= 16000000L
 atmega644p: LDSECTIONS  = -Wl,--section-start=.text=0xfc00 -Wl,--section-start=.version=0xfffe
 atmega644p: CFLAGS += $(UARTCMD)
-atmega644p: atmega644p/$(PROGRAM)_atmega644p_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega644p: atmega644p/$(PROGRAM)_atmega644p_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega644p: atmega644p/$(PROGRAM)_atmega644p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega644p: atmega644p/$(PROGRAM)_atmega644p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 atmega644pa: atmega644p
 
 
@@ -352,8 +355,8 @@ atmega1284: CFLAGS += $(COMMON_OPTIONS) -DBIGBOOT
 atmega1284: AVR_FREQ ?= 16000000L
 atmega1284: LDSECTIONS  = -Wl,--section-start=.text=0x1f800 -Wl,--section-start=.version=0x1fffe
 atmega1284: CFLAGS += $(UARTCMD)
-atmega1284: atmega1284/$(PROGRAM)_atmega1284_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega1284: atmega1284/$(PROGRAM)_atmega1284_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega1284: atmega1284/$(PROGRAM)_atmega1284_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega1284: atmega1284/$(PROGRAM)_atmega1284_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 
 
 # ATmega1284P
@@ -363,8 +366,8 @@ atmega1284p: CFLAGS += $(COMMON_OPTIONS) -DBIGBOOT
 atmega1284p: AVR_FREQ ?= 16000000L
 atmega1284p: LDSECTIONS  = -Wl,--section-start=.text=0x1f800 -Wl,--section-start=.version=0x1fffe
 atmega1284p: CFLAGS += $(UARTCMD)
-atmega1284p: atmega1284p/$(PROGRAM)_atmega1284p_$(BAUD_RATE)_$(AVR_FREQ).hex
-atmega1284p: atmega1284p/$(PROGRAM)_atmega1284p_$(BAUD_RATE)_$(AVR_FREQ).lst
+atmega1284p: atmega1284p/$(PROGRAM)_atmega1284p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).hex
+atmega1284p: atmega1284p/$(PROGRAM)_atmega1284p_$(BAUD_RATE)_$(AVR_FREQ)$(SUFFIX).lst
 
 
 #---------------------------------------------------------------------------
