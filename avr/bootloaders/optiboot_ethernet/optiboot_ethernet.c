@@ -296,6 +296,7 @@ optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
 #define EEPROM_BOOTLOADER_FLAG_OFFSET         0x22
 #define EEPROM_BOOTLOADER_MAGIC_VALUE         0x55
 #define EEPROM_BOOTLOADER_BORING_VALUE        0xFF
+#define EEPROM_BOOTLOADER_PORT_OFFSET         0x23
 
 // W5100 registers
 #define  W5100_MR               0x0000      /* Mode Register */
@@ -1017,11 +1018,20 @@ void ethernet_init(void)
     w++;
     r++;
   }while(r < EEPROM_BOOTLOADER_FLAG_OFFSET);
+  
+  // EEPROM_BOOTLOADER_PORT_OFFSET
+  uint8_t portMsb = eeprom_read_byte((uint8_t*)(EEPROM_BOOTLOADER_FLAG_OFFSET));
+  uint8_t portLsb = eeprom_read_byte((uint8_t*)(EEPROM_BOOTLOADER_FLAG_OFFSET + 1));
 
+  if (!(portMsb | portLsb)) {
+    // No port set in EEPROM, use a default value
+    portMsb = 0xF0;
+  }
+  
   // put socket 0 into listen mode
   W51_write(W5100_SKT_BASE(0) + W5100_MR_OFFSET, W5100_SKT_MR_TCP);
-  W51_write(W5100_SKT_BASE(0) + W5100_PORT_OFFSET + 0, 0x11); // port 0x11d0 = 4560
-  W51_write(W5100_SKT_BASE(0) + W5100_PORT_OFFSET + 1, 0xd0);
+  W51_write(W5100_SKT_BASE(0) + W5100_PORT_OFFSET + 0, portMsb);
+  W51_write(W5100_SKT_BASE(0) + W5100_PORT_OFFSET + 1, portLsb);
   W51_execute(W5100_SKT_CR_OPEN);
   // ... assume success
   W51_execute(W5100_SKT_CR_LISTEN);
