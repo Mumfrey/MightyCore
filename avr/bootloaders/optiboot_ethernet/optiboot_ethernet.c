@@ -789,7 +789,7 @@ int main(void) {
       writebuffer(desttype, buff, address, savelength);
 
 #ifdef UART1_DEBUG
-      debug('!');debug(10);debug(13);
+      debug('!'); //debug(10);debug(13);
 #endif
 
     }
@@ -939,9 +939,8 @@ void ethernet_init(void)
     r++;
   }while(r < EEPROM_BOOTLOADER_FLAG_OFFSET);
   
-  // EEPROM_BOOTLOADER_PORT_OFFSET
-  uint8_t portMsb = eeprom_read_byte((uint8_t*)(EEPROM_BOOTLOADER_FLAG_OFFSET));
-  uint8_t portLsb = eeprom_read_byte((uint8_t*)(EEPROM_BOOTLOADER_FLAG_OFFSET + 1));
+  uint8_t portMsb = eeprom_read_byte((uint8_t*)(EEPROM_BOOTLOADER_PORT_OFFSET));
+  uint8_t portLsb = eeprom_read_byte((uint8_t*)(EEPROM_BOOTLOADER_PORT_OFFSET + 1));
 
   if (!(portMsb | portLsb)) {
     // No port set in EEPROM, use a default value
